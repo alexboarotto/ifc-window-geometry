@@ -60,9 +60,6 @@ def create_double_panel_horizontal(OHeight, OWidth):
   print("Transom Offset> ", end="")
   TransomOffset = int(input())
 
-  print("Transom Offset> ", end="")
-  TransomOffset = int(input())
-
   print("Transom Thickness> ", end="")
   TransomThickness = int(input())
 
