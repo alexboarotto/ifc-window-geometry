@@ -56,13 +56,13 @@ class generate_geometry:
         output["lining"]["outer"] = self.rectangle(OverallWidth, OverallHeight)
 
         # generate inner rectangle from outer rectangle using lining thickness 
-        output["lining"]["inner"] = self.offset_rectangle(self, thickness=LiningProps["LiningThickness"], outer_rect=output["lining"]["outer"])
+        output["lining"]["inner"] = self.offset_rectangle(self, offset=LiningProps["LiningThickness"], outer_rect=output["lining"]["outer"])
 
         # generates outer rectangle for frame given the offset from the lining
-        output["panels"]["frame"]["outer"] = self.offset_rectangle(self, thickness=LiningProps["LiningToPanelOffsetX"], outer_rect=output["lining"]["outer"])
+        output["panels"]["frame"]["outer"] = self.offset_rectangle(self, offset=LiningProps["LiningToPanelOffsetX"], outer_rect=output["lining"]["outer"])
 
         # generate inner rectangle from outer rectangle using frame thickness 
-        output["panels"]["frame"]["inner"] = self.offset_rectangle(self, thickness=PanelProps["FrameThickness"], outer_rect=output["panels"]["frame"]["outer"])
+        output["panels"]["frame"]["inner"] = self.offset_rectangle(self, offset=PanelProps["FrameThickness"], outer_rect=output["panels"]["frame"]["outer"])
 
         return output
 
