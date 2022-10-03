@@ -41,18 +41,49 @@ def create_single_panel(OHeight, OWidth):
   print("Frame Thickness> ", end="")
   FrameThickness = int(input())
 
-  print(format(geo.single_panel(OverallHeight=OHeight,
-                   OverallWidth=OWidth,
-                   LiningProps=props.get_lining_props(LiningThickness=LiningThickness, LiningToPanelOffsetX=LiningToPanelOffsetX), 
-                   PanelProps=props.get_panel_props(FrameThickness=FrameThickness)
-                  )   
-  )) 
+  print(geo.single_panel(
+    OverallHeight=OHeight,
+    OverallWidth=OWidth,
+    LiningProps=props.get_lining_props(LiningThickness=LiningThickness, LiningToPanelOffsetX=LiningToPanelOffsetX), 
+    PanelProps=props.get_panel_props(FrameThickness=FrameThickness)
+    )   
+  )
 
-# ===================================================
-# TODO: create functions for remaining window types
-# ===================================================
-def create_double_panel_horizontal():
-  pass
+
+def create_double_panel_horizontal(OHeight, OWidth):
+  print("Lining Thickness> ", end="")
+  LiningThickness = int(input())
+
+  print("Lining To Panel Offset X> ", end="")
+  LiningToPanelOffsetX = int(input())
+
+  print("Transom Offset> ", end="")
+  TransomOffset = int(input())
+
+  print("Transom Offset> ", end="")
+  TransomOffset = int(input())
+
+  print("Transom Thickness> ", end="")
+  TransomThickness = int(input())
+
+  print("Bottom Frame Thickness> ", end="")
+  BFrameThickness = int(input())
+
+  print("Top Frame Thickness> ", end="")
+  TFrameThickness = int(input())
+
+  print(geo.double_panel_horizontal(
+    OverallHeight=OHeight,
+    OverallWidth=OWidth,
+    LiningProps=props.get_lining_props(
+      LiningThickness=LiningThickness,
+      LiningToPanelOffsetX=LiningToPanelOffsetX,
+      TransomOffset = TransomOffset,
+      TransomThickness = TransomThickness), 
+    BottomPanelProps=props.get_panel_props(FrameThickness=BFrameThickness),
+    TopPanelProps=props.get_panel_props(FrameThickness=TFrameThickness)
+    )   
+  )
 
 def create_double_panel_vertical():
   pass
