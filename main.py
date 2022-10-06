@@ -75,7 +75,7 @@ def create_double_panel_horizontal(OHeight, OWidth):
     LiningProps=props.get_lining_props(
       LiningThickness=LiningThickness,
       LiningToPanelOffsetX=LiningToPanelOffsetX,
-      TransomOffset = TransomOffset,
+      FirstTransomOffset = TransomOffset,
       TransomThickness = TransomThickness), 
     BottomPanelProps=props.get_panel_props(FrameThickness=BFrameThickness),
     TopPanelProps=props.get_panel_props(FrameThickness=TFrameThickness)

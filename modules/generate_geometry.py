@@ -138,7 +138,7 @@ class generate_geometry:
 
         # calculate top rectangle parameters
         LTopSP = numpy.array([Lthickness, 0, OverallHeight-TransomOffset+TransomThickness/2])
-        LTopHeight = OverallHeight-TransomOffset+TransomThickness/2-Lthickness
+        LTopHeight = OverallHeight-TransomOffset+TransomThickness/2-Lthickness*2
         LTopWidth = OverallWidth - Lthickness*2 
 
         # generate top inner rectangle for lining
@@ -152,13 +152,13 @@ class generate_geometry:
         FTopThickness = TopPanelProps["FrameThickness"]
 
         # generates outer rectangle for frame given the offset from the lining inner rect
-        output["panels"]["frame_bottom"]["outer"] = self.offset_rectangle(self, offset=-Lthickness-LTFoffsetX, outer_rect=output["lining"]["inner"]["inner_bottom"])
+        output["panels"]["frame_bottom"]["outer"] = self.offset_rectangle(self, offset=-(Lthickness-LTFoffsetX), outer_rect=output["lining"]["inner"]["inner_bottom"])
 
-        # generate inner rectangle from outer rectangle using frame thickness 
+        # generate inner rectangle from outer rectangle using frame thickness
         output["panels"]["frame_bottom"]["inner"] = self.offset_rectangle(self, offset=FBottomThickness, outer_rect=output["panels"]["frame_bottom"]["outer"])
 
         # generates outer rectangle for frame given the offset from the lining inner rect
-        output["panels"]["frame_top"]["outer"] = self.offset_rectangle(self, offset=-Lthickness-LTFoffsetX, outer_rect=output["lining"]["inner"]["inner_top"])
+        output["panels"]["frame_top"]["outer"] = self.offset_rectangle(self, offset=-(Lthickness-LTFoffsetX), outer_rect=output["lining"]["inner"]["inner_top"])
 
         # generate inner rectangle from outer rectangle using frame thickness 
         output["panels"]["frame_top"]["inner"] = self.offset_rectangle(self, offset=FTopThickness, outer_rect=output["panels"]["frame_top"]["outer"])
@@ -167,9 +167,88 @@ class generate_geometry:
 
 
 
+    """
+    GENERATES AND RETURNS SCHEMA FOR 'DOUBLE_PANEL_VERTICAL' WINDOW TYPE
+    Lining contains 2 inner rectangles (one for each frame) separated by a mulliojn
+    There are 2 panels:
+    The first starts offsetted from the bottom left corner of the lining
+    The second one starts offsetted from the intersection between the lining's bottom side and mullion centerline
+    """
     @classmethod
-    def double_panel_vertical():
-        pass
+    def double_panel_vertical(self, OverallHeight, OverallWidth, LiningProps, LeftPanelProps, RightPanelProps):
+        # schema for DOUBLE_PANEL_VERTICAL geometry
+        output = {"lining":
+                    {
+                        "outer": [],
+                        "inner": {
+                            "inner_left": [],
+                            "inner_right": []  
+                        }
+                    },
+                    "panels":
+                    {
+                        "frame_left":
+                        {
+                            "outer": [],
+                            "inner": []
+                        },
+                        "frame_right":
+                        {
+                            "outer": [],
+                            "inner": []
+                        }
+                    }
+                }
+        
+
+        # Handle to props
+        Lthickness = LiningProps["LiningThickness"]
+        MullionOffset = LiningProps["FirstMullionOffset"] 
+        MullionThickness = LiningProps["MullionThickness"]
+
+        #==============================================================
+        # LINING
+        #==============================================================
+
+        # generate rectangle using overall height and width
+        output["lining"]["outer"] = self.rectangle(OverallWidth, OverallHeight)
+
+        # calculate left rectangle parameters
+        LLeftSP = numpy.array([Lthickness, 0, Lthickness])
+        LLeftWidth = MullionOffset - Lthickness - MullionThickness/2
+        LLeftHeight = OverallHeight - Lthickness*2 
+
+        # generate left inner rectangle for lining
+        output["lining"]["inner"]["inner_left"] = self.rectangle(starting_point=LLeftSP, height=LLeftHeight, width=LLeftWidth)
+
+        # calculate right rectangle parameters
+        LRightSP = numpy.array([Lthickness, 0, OverallHeight-MullionOffset+MullionThickness/2])
+        LRightWidth = OverallWidth-MullionOffset+MullionThickness/2-Lthickness*2
+        LRightHeight = OverallHeight - Lthickness*2 
+
+        # generate right inner rectangle for lining
+        output["lining"]["inner"]["inner_right"] = self.rectangle(starting_point=LRightSP, height=LRightHeight, width=LRightWidth)
+
+        #==============================================================
+        # PANELS
+        #==============================================================
+        LTFoffsetX = LiningProps["LiningToPanelOffsetX"]
+        FLeftThickness = LeftPanelProps["FrameThickness"]
+        FRightThickness = RightPanelProps["FrameThickness"]
+
+        # generates outer rectangle for frame given the offset from the lining inner rect
+        output["panels"]["frame_left"]["outer"] = self.offset_rectangle(self, offset=-(Lthickness-LTFoffsetX), outer_rect=output["lining"]["inner"]["inner_left"])
+
+        # generate inner rectangle from outer rectangle using frame thickness 
+        output["panels"]["frame_left"]["inner"] = self.offset_rectangle(self, offset=FLeftThickness, outer_rect=output["panels"]["frame_left"]["outer"])
+
+        # generates outer rectangle for frame given the offset from the lining inner rect
+        output["panels"]["frame_right"]["outer"] = self.offset_rectangle(self, offset=-(Lthickness-LTFoffsetX), outer_rect=output["lining"]["inner"]["inner_right"])
+
+        # generate inner rectangle from outer rectangle using frame thickness 
+        output["panels"]["frame_right"]["inner"] = self.offset_rectangle(self, offset=FRightThickness, outer_rect=output["panels"]["frame_right"]["outer"])
+
+        return output 
 
     @classmethod
     def triple_panel_bottom():
