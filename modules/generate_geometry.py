@@ -250,9 +250,17 @@ class generate_geometry:
 
         return output 
 
+    """
+    GENERATES AND RETURNS SCHEMA FOR 'TRIPLE_PANEL_BOTTOM' WINDOW TYPE
+    Lining contains 3 inner rectangles (one for each frame)
+    There are 3 panels:
+    The first starts offsetted from the bottom left corner of the lining and extends horizontally to the other end of the lining
+    but extends vertically until the transom
+    The second and third start above the bottom one and are separated by a mullion
+    """
     @classmethod
     def triple_panel_bottom(self, OverallHeight, OverallWidth, LiningProps, LeftPanelProps, RightPanelProps, BottomPanelProps):
-         # schema for TRIPLE_PANEL_BOTTOM geometry
+        # schema for TRIPLE_PANEL_BOTTOM geometry
         output = {"lining":
                     {
                         "outer": [],
@@ -349,9 +357,110 @@ class generate_geometry:
 
         return output 
 
+    """
+    GENERATES AND RETURNS SCHEMA FOR 'TRIPLE_PANEL_HORIZONTAL' WINDOW TYPE
+    Lining contains 3 inner rectangles (one for each frame)
+    There are 3 panels:
+    Top, middle and bottom. Divided by 2 transoms
+    """
     @classmethod
-    def triple_panel_horizontal():
-        pass
+    def triple_panel_horizontal(self, OverallHeight, OverallWidth, LiningProps, TopPanelProps, MiddlePanelProps, BottomPanelProps):
+        # schema for TRIPLE_PANEL_BOTTOM geometry
+        output = {"lining":
+                    {
+                        "outer": [],
+                        "inner": {
+                            "inner_top": [],
+                            "inner_middle": [], 
+                            "inner_bottom": [] 
+                        }
+                    },
+                    "panels":
+                    {
+                        "frame_top":
+                        {
+                            "outer": [],
+                            "inner": []
+                        },
+                        "frame_middle":
+                        {
+                            "outer": [],
+                            "inner": []
+                        },
+                        "frame_bottom":
+                        {
+                            "outer": [],
+                            "inner": []
+                        }
+                    }
+                }
+        
+
+        # Handle to props
+        Lthickness = LiningProps["LiningThickness"]
+        FirstTransomOffset = LiningProps["FirstTransomOffset"] 
+        SecondTransomOffset = LiningProps["SecondTransomOffset"] 
+        TransomThickness = LiningProps["TransomThickness"]
+
+
+        #==============================================================
+        # LINING
+        #==============================================================
+
+        # generate rectangle using overall height and width
+        output["lining"]["outer"] = self.rectangle(OverallWidth, OverallHeight)
+
+        # calculate bottom rectangle parameters
+        LBottomSP = numpy.array([Lthickness, 0, Lthickness])
+        LBottomHeight = FirstTransomOffset - Lthickness - TransomThickness/2
+        LBottomWidth = OverallWidth - Lthickness*2 
+
+        # generate bottom inner rectangle for lining 
+        output["lining"]["inner"]["inner_bottom"] = self.rectangle(starting_point=LBottomSP, height=LBottomHeight, width=LBottomWidth)
+
+        # calculate Middle rectangle parameters
+        LMiddleSP = numpy.array([Lthickness, 0, FirstTransomOffset+TransomThickness/2])
+        LMiddleWidth = LBottomWidth
+        LMiddleHeight = SecondTransomOffset-FirstTransomOffset-TransomThickness
+
+        # generate right inner rectangle for lining
+        output["lining"]["inner"]["inner_middle"] = self.rectangle(starting_point=LMiddleSP, height=LMiddleHeight, width=LMiddleWidth)
+
+        # calculate Top rectangle parameters
+        LTopSP = numpy.array([Lthickness, 0, SecondTransomOffset+TransomThickness/2])
+        LTopWidth = LBottomWidth
+        LTopHeight = OverallHeight-SecondTransomOffset-TransomThickness/2-Lthickness 
+
+        # generate Top inner rectangle for lining
+        output["lining"]["inner"]["inner_top"] = self.rectangle(starting_point=LTopSP, height=LTopHeight, width=LTopWidth)
+
+        #==============================================================
+        # PANELS
+        #==============================================================
+        LTFoffsetX = LiningProps["LiningToPanelOffsetX"]
+        FTopThickness = TopPanelProps["FrameThickness"]
+        FMiddleThickness = MiddlePanelProps["FrameThickness"]
+        FBottomThickness = BottomPanelProps["FrameThickness"]
+
+        # generates outer rectangle for frame given the offset from the lining inner rect
+        output["panels"]["frame_bottom"]["outer"] = self.offset_rectangle(self, offset=-(Lthickness-LTFoffsetX), outer_rect=output["lining"]["inner"]["inner_bottom"])
+
+        # generate inner rectangle from outer rectangle using frame thickness 
+        output["panels"]["frame_bottom"]["inner"] = self.offset_rectangle(self, offset=FBottomThickness, outer_rect=output["panels"]["frame_bottom"]["outer"])
+
+        # generates outer rectangle for frame given the offset from the lining inner rect
+        output["panels"]["frame_middle"]["outer"] = self.offset_rectangle(self, offset=-(Lthickness-LTFoffsetX), outer_rect=output["lining"]["inner"]["inner_middle"])
+
+        # generate inner rectangle from outer rectangle using frame thickness 
+        output["panels"]["frame_middle"]["inner"] = self.offset_rectangle(self, offset=FMiddleThickness, outer_rect=output["panels"]["frame_middle"]["outer"])
+
+        # generates outer rectangle for frame given the offset from the lining inner rect
+        output["panels"]["frame_top"]["outer"] = self.offset_rectangle(self, offset=-(Lthickness-LTFoffsetX), outer_rect=output["lining"]["inner"]["inner_top"])
+
+        # generate inner rectangle from outer rectangle using frame thickness 
+        output["panels"]["frame_top"]["inner"] = self.offset_rectangle(self, offset=FTopThickness, outer_rect=output["panels"]["frame_top"]["outer"])
+
+        return output 
 
     @classmethod
     def triple_panel_left():
