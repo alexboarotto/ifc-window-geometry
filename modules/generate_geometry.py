@@ -463,8 +463,103 @@ class generate_geometry:
         return output 
 
     @classmethod
-    def triple_panel_left():
-        pass
+    def triple_panel_left(self, OverallHeight, OverallWidth, LiningProps, LeftPanelProps, TopRightPanelProps, BottomRightPanelProps):
+        # schema for TRIPLE_PANEL_BOTTOM geometry
+        output = {"lining":
+                    {
+                        "outer": [],
+                        "inner": {
+                            "inner_left": [],
+                            "inner_right_top": [], 
+                            "inner_right_bottom": [] 
+                        }
+                    },
+                    "panels":
+                    {
+                        "frame_left":
+                        {
+                            "outer": [],
+                            "inner": []
+                        },
+                        "frame_right_top":
+                        {
+                            "outer": [],
+                            "inner": []
+                        },
+                        "frame_right_bottom":
+                        {
+                            "outer": [],
+                            "inner": []
+                        }
+                    }
+                }
+        
+
+        # Handle to props
+        Lthickness = LiningProps["LiningThickness"]
+        TransomOffset = LiningProps["FirstTransomOffset"] 
+        TransomThickness = LiningProps["TransomThickness"]
+        MullionOffset = LiningProps["FirstMullionOffset"] 
+        MullionThickness = LiningProps["MullionThickness"]
+
+        #==============================================================
+        # LINING
+        #==============================================================
+
+        # generate rectangle using overall height and width
+        output["lining"]["outer"] = self.rectangle(OverallWidth, OverallHeight)
+
+        # calculate Left rectangle parameters
+        LLeftSP = numpy.array([Lthickness, 0, Lthickness])
+        LLeftHeight = OverallHeight - Lthickness*2
+        LLeftWidth = MullionOffset - Lthickness - MullionThickness/2
+
+        # generate Left inner rectangle for lining 
+        output["lining"]["inner"]["inner_left"] = self.rectangle(starting_point=LLeftSP, height=LLeftHeight, width=LLeftWidth)
+
+        # calculate bottom right rectangle parameters
+        LRightBSP = numpy.array([MullionOffset+MullionThickness/2, 0, Lthickness])
+        LRightBWidth = OverallWidth-MullionOffset-Lthickness - MullionThickness/2
+        LRightBHeight = TransomOffset-Lthickness-TransomThickness/2
+
+        # generate right inner rectangle for lining
+        output["lining"]["inner"]["inner_right_bottom"] = self.rectangle(starting_point=LRightBSP, height=LRightBHeight, width=LRightBWidth)
+
+        # calculate right rectangle parameters
+        LRightTSP = numpy.array([TransomOffset+TransomThickness/2, 0, MullionOffset+MullionThickness/2])
+        LRightTWidth = OverallWidth-MullionOffset-MullionThickness/2-Lthickness
+        LRightTHeight = OverallHeight-TransomOffset-TransomThickness/2-Lthickness 
+
+        # generate top right inner rectangle for lining
+        output["lining"]["inner"]["inner_right_top"] = self.rectangle(starting_point=LRightTSP, height=LRightTHeight, width=LRightTWidth)
+
+        #==============================================================
+        # PANELS
+        #==============================================================
+        LTFoffsetX = LiningProps["LiningToPanelOffsetX"]
+        FLeftThickness = LeftPanelProps["FrameThickness"]
+        FRightBThickness = BottomRightPanelProps["FrameThickness"]
+        FRightTThickness = TopRightPanelProps["FrameThickness"]
+
+        # generates outer rectangle for frame given the offset from the lining inner rect
+        output["panels"]["frame_left"]["outer"] = self.offset_rectangle(self, offset=-(Lthickness-LTFoffsetX), outer_rect=output["lining"]["inner"]["inner_left"])
+
+        # generate inner rectangle from outer rectangle using frame thickness 
+        output["panels"]["frame_left"]["inner"] = self.offset_rectangle(self, offset=FLeftThickness, outer_rect=output["panels"]["frame_left"]["outer"])
+
+        # generates outer rectangle for frame given the offset from the lining inner rect
+        output["panels"]["frame_right_top"]["outer"] = self.offset_rectangle(self, offset=-(Lthickness-LTFoffsetX), outer_rect=output["lining"]["inner"]["inner_right_top"])
+
+        # generate inner rectangle from outer rectangle using frame thickness 
+        output["panels"]["frame_right_top"]["inner"] = self.offset_rectangle(self, offset=FRightTThickness, outer_rect=output["panels"]["frame_right_top"]["outer"])
+
+        # generates outer rectangle for frame given the offset from the lining inner rect
+        output["panels"]["frame_right_bottom"]["outer"] = self.offset_rectangle(self, offset=-(Lthickness-LTFoffsetX), outer_rect=output["lining"]["inner"]["inner_right_bottom"])
+
+        # generate inner rectangle from outer rectangle using frame thickness 
+        output["panels"]["frame_right_bottom"]["inner"] = self.offset_rectangle(self, offset=FRightBThickness, outer_rect=output["panels"]["frame_right_bottom"]["outer"])
+
+        return output 
 
     @classmethod
     def triple_panel_right():
