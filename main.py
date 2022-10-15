@@ -198,8 +198,49 @@ def create_triple_panel_horizontal(OHeight, OWidth):
     )   
   )
 
-def create_triple_panel_left():
-  pass
+def create_triple_panel_left(OHeight, OWidth):
+  print("Lining Thickness> ", end="")
+  LiningThickness = int(input())
+
+  print("Lining To Panel Offset X> ", end="")
+  LiningToPanelOffsetX = int(input())
+
+  print("Mullion Offset> ", end="")
+  MullionOffset = int(input())
+
+  print("Mullion Thickness> ", end="")
+  MullionThickness = int(input())
+
+  print("Transom Offset> ", end="")
+  TransomOffset = int(input())
+
+  print("Transom Thickness> ", end="")
+  TransomThickness = int(input())
+
+  print("Left Frame Thickness> ", end="")
+  LFrameThickness = int(input())
+
+  print("Right Frame Thickness> ", end="")
+  RTFrameThickness = int(input())
+
+  print("Bottom Frame Thickness> ", end="")
+  RBFrameThickness = int(input())
+
+  print(geo.triple_panel_left(
+    OverallHeight=OHeight,
+    OverallWidth=OWidth,
+    LiningProps=props.get_lining_props(
+      LiningThickness=LiningThickness,
+      LiningToPanelOffsetX=LiningToPanelOffsetX,
+      FirstMullionOffset = MullionOffset,
+      MullionThickness = MullionThickness,
+      FirstTransomOffset = TransomOffset,
+      TransomThickness = TransomThickness), 
+    LeftPanelProps=props.get_panel_props(FrameThickness=LFrameThickness),
+    TopRightPanelProps=props.get_panel_props(FrameThickness=RTFrameThickness),
+    BottomRightPanelProps=props.get_panel_props(FrameThickness=RBFrameThickness)
+    )   
+  )
 
 def create_triple_panel_right():
   pass
